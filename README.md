@@ -1,7 +1,7 @@
 
 # 📚 Mono-Kit Library Documentation
 
-The **`mono-kit`** library provides a unified interface for semantic search over **text**, **audio**, and **image** data using `chromadb` as the backend. It supports default and custom-trained embedding models and allows both single and batch file indexing.
+**`mono-kit`** is a lightweight library that lets you build your own `Google Lens`, `hum-to-search`, and `RAG-style` applications. It supports **text**, **audio**, and **image** embeddings using both default and custom-trained models — with simple tools for processing single or batch data across modalities.
 
 ---
 
@@ -119,7 +119,7 @@ print(result)
 
 ---
 
-## 🖼️ Image Search: `mono_image`
+## 🖼️ Image Search: `mobo_image`
 
 ### 1. Initialize Image Handler
 

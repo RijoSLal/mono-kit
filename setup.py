@@ -2,11 +2,13 @@ from setuptools import setup, find_packages
 
 with open("README.md", "r") as f:
     long_description = f.read()
+desc = "A flexible toolkit for semantic search across text, audio, and image data, featuring customizable embedding model support."
 
 setup(
      name="mono-kit", 
-     version="0.1.1",
+     version="0.1.3",
      packages= find_packages(), 
+     description=desc,
      install_requires=[
          
             "chromadb==1.0.13",
