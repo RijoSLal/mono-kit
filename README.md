@@ -1,7 +1,23 @@
 
 # 📚 Mono-Kit Library Documentation
 
-**`mono-kit`** is a lightweight library that lets you build your own `Google Lens`, `hum-to-search`, and `RAG-style` applications. It supports **text**, **audio**, and **image** embeddings using both default and custom-trained models — with simple tools for processing single or batch data across modalities.
+**`mono-kit`** is a versatile machine learning library designed to help developers build advanced **similarity retrieval systems** such as **Google Lens (image similarity retrieval)**, **hum-to-search (audio similarity retrieval)**, and **RAG-style retrieval systems**. It supports **document**, **audio**, and **image** inputs, offering a suite of pretrained embedding models as well as finetunable custom built-in models. With `mono-kit`, you can perform similarity-based retrieval effortlessly—no need to implement complex pipelines. Everything you need comes ready to use, right out of the box.
+
+## Available Models
+
+`mono-kit` comes with powerful, production-ready models tailored for each modality:
+
+- **Image**  
+  - **Default**: `ResNet-50`  
+  - **Custom**: Finetunable customized `ResNet-50` for domain-specific tasks
+
+- **Audio**  
+  - **Default**: `VGGish`  
+  - **Custom**: Finetunable custom **Siamese network** with a **custom loss function** for enhanced similarity learning
+
+- **Document**  
+  - **Default**: `all-MiniLM-L6-v2` – a compact and efficient transformer model ideal for semantic document embeddings
+
 
 ---
 
@@ -17,6 +33,8 @@ pip install mono-kit
 
 
 ## 🔧 Initialization
+
+`mono-kit` uses **ChromaDB** by default for embedding storage and retrieval.
 
 Start by initializing a `chromadb` client:
 
@@ -168,8 +186,6 @@ mono_img.mount_image_batch("image_directory", model_path=model)
 result = mono_img.find_similar_image("query.jpg", k=3, model_path=model)
 print(result)
 ```
-
----
 
 ---
 
