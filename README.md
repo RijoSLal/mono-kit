@@ -42,7 +42,7 @@ or
 # PyPI link is currently unavailable due to an account recovery delay. It will be updated shortly
 ```
 
-- **Documentation:** M2/README.md
+- **Documentation:** https://github.com/RijoSLal/mono-kit/blob/main/M2/README.md
 
 ## Retrieval Capabilities
 
@@ -67,7 +67,7 @@ Video ↔ Video, Text, Image, Audio
 |----------|----------|
 | Image | EfficientNet-B0 |
 | Audio | Log-Mel Spectrogram + RoPE-based encoder |
-| Video | RCNN-inspired architecture with Attention layers |
+| Video | LRCN-inspired architecture with Attention layers |
 | Text | LLM-style RoPE-based encoder |
 
 ## Training
