@@ -1,203 +1,96 @@
+# Mono-Kit
 
-# 📚 Mono-Kit Library Documentation
+Mono-Kit is a library for multimodal embeddings and vector retrieval. It provides embedding models that project text, images, audio, and video into a shared embedding space, together with a custom vector database for indexing and similarity search over those embeddings.
 
-**`mono-kit`** is a versatile machine learning library designed to help developers build advanced **similarity retrieval systems** such as **Google Lens (image similarity retrieval)**, **hum-to-search (audio similarity retrieval)**, and **RAG-style retrieval systems**. It supports **document**, **audio**, and **image** inputs, offering a suite of pretrained embedding models as well as finetunable custom built-in models. With `mono-kit`, you can perform similarity-based retrieval effortlessly—no need to implement complex pipelines. Everything you need comes ready to use, right out of the box.
+![architecture](assets/mono_kit_dual_model_path.svg)
 
-## Available Models
+The project currently includes:
 
-`mono-kit` comes with powerful, production-ready models tailored for each modality:
+- `mono_model`, a trainable multimodal embedding model.
+- [`ImageBind`](https://github.com/facebookresearch/ImageBind.git) integration.
+- A vector database implemented in Rust with Python bindings via PyO3.
 
-- **Image**  
-  - **Default**: `ResNet-50`  
-  - **Custom**: Finetunable customized `ResNet-50` for domain-specific tasks
+## Note
 
-- **Audio**  
-  - **Default**: `VGGish`  
-  - **Custom**: Finetunable custom **Siamese network** with a **custom loss function** for enhanced similarity learning
+### M1 (Legacy)
 
-- **Document**  
-  - **Default**: `all-MiniLM-L6-v2` – a compact and efficient transformer model ideal for semantic document embeddings
+The first iteration of Mono-Kit, built using VGGish (audio), MobileNet (image), MXBAI (text embeddings), Chroma, and a custom user-trainable Siamese similarity model. It provides multimodal functionality, but the embeddings do not share a common latent space and lack true cross-modal understanding. By today's standards, M1 is obsolete.
 
-
----
-
-## 📦 Installation
-
-Install the library via pip:
+#### Install M1
 
 ```bash
-
 pip install mono-kit
-
 ```
 
+- **PyPI:** https://pypi.org/project/mono-kit
 
-## 🔧 Initialization
+### M2 (Recommended)
 
-`mono-kit` uses **ChromaDB** by default for embedding storage and retrieval.
+A significantly more powerful and capable compare of M1.
 
-Start by initializing a `chromadb` client:
+#### Install M2
 
-```python
-import chromadb
+```bash
+git clone https://github.com/RijoSLal/mono-kit.git
+rm -rf M1
+cd M2
+pip install .
+```
+or 
 
-client = chromadb.PersistentClient(path="path_to_save")
+```bash
+# PyPI link is currently unavailable due to an account recovery delay. It will be updated shortly
 ```
 
-> ✅ **You can use any `chromadb` client (e.g., `EphemeralClient`, `HttpClient`, etc.), not just `PersistentClient`.**
+- **Documentation:** M2/README.md
 
-> ⚠️ **Collection Name Constraint:**
-> Each of `mono_document`, `mono_audio`, and `mono_image` **must use unique collection names**.
-> You can reuse a collection name across default and custom models.
+## Retrieval Capabilities
 
----
-
-## 📝 Text Search: `mono_document`
-
-### 1. Initialize Document Handler
-
-```python
-mono_docs = mono_document(client, "unique_text_collection")
+```text
+Text  ↔ Text, Image, Audio, Video
+Image ↔ Image, Text, Audio, Video
+Audio ↔ Audio, Text, Image, Video
+Video ↔ Video, Text, Image, Audio
 ```
 
-### 2. Text Splitting and Mounting
+## Features
 
-```python
-text = """Your long text block here..."""
-docs = mono_docs.text_splitter(text, (150, 200), 20, False)
+- Shared embedding space for text, image, audio, and video.
+- Cross-modal and same-modal retrieval.
+- Custom vector database implemented in Rust.
+- Python bindings via PyO3.
+- Trainable multimodal embedding model (`mono_model`).
 
-for id, doc in enumerate(docs):
-    mono_docs.mount_document(doc, str(id))
+## `mono_model` Architecture
+
+| Modality | Encoder |
+|----------|----------|
+| Image | EfficientNet-B0 |
+| Audio | Log-Mel Spectrogram + RoPE-based encoder |
+| Video | RCNN-inspired architecture with Attention layers |
+| Text | LLM-style RoPE-based encoder |
+
+## Training
+
+```bash
+M2/monokit.ipynb
 ```
 
-* `(150, 200)`: Min/max character chunk size
-* `20`: Overlap in characters
-* `False`: If `True`, will retain sentence boundaries (optional feature)
+> ! WARNING....
+> The released `mono_model` weights were trained on approximately **15,000 samples** due to hardware constraints and should be considered experimental.
+>
+> For reference, `mono_model` has approximately **145M parameters**. Following the Chinchilla scaling law (`~20 tokens per parameter`), a compute-optimal training run would require roughly:
+>
+> `145M × 20 ≈ 2.9B` training tokens (or token-equivalent multimodal samples),
+>
+> which is several orders of magnitude larger than the released checkpoint and would typically involve training over multiple epochs.
 
-### 3. Semantic Search
+## Testing
 
-```python
-result = mono_docs.find_similar_documents("search query here", k=3)
-print(result)
+```bash
+python test.py
 ```
 
----
+## License
 
-## 🔊 Audio Search: `mono_audio`
-
-### 1. Initialize Audio Handler
-
-```python
-mono_aud = mono_audio(client, "unique_audio_collection")
-```
-
-### 2. Mount Audio Files
-
-```python
-mono_aud.mount_audio("path/to/audio1.mp3")
-mono_aud.mount_audio("path/to/audio2.mp3")
-```
-
-### 3. Batch Mounting
-
-```python
-mono_aud.mount_audio_batch("path/to/audio_directory")
-```
-
-### 4. Find Similar Audio
-
-```python
-result = mono_aud.find_similar_audio("path/to/query.mp3", k=3)
-print(result)
-```
-
----
-
-### ✅ With Custom Audio Model
-
-#### 1. Train Custom Audio Model
-
-```python
-x = "path/to/reference_audio"
-y = "path/to/target_audio"
-mono_aud.create_audio_model(directory_x=x, directory_y=y)
-```
-
-#### 2. Mount and Search with Custom Model
-
-```python
-model_path = "custom_trained_audio_embedding_model/audio_model.keras"
-
-mono_aud.mount_audio("audio.mp3", model_path=model_path)
-mono_aud.mount_audio_batch("audio_directory", model_path=model_path)
-
-result = mono_aud.find_similar_audio("query.mp3", k=2, model_path=model_path)
-print(result)
-```
-
----
-
-## 🖼️ Image Search: `mobo_image`
-
-### 1. Initialize Image Handler
-
-```python
-mono_img = mono_image(client, "unique_image_collection")
-```
-
-### 2. Mount Images
-
-```python
-mono_img.mount_image("path/to/image.jpg")
-```
-
-### 3. Batch Mounting
-
-```python
-mono_img.mount_image_batch("path/to/image_directory")
-```
-
-### 4. Find Similar Images
-
-```python
-result = mono_img.find_similar_image("path/to/query_image.jpg", k=3)
-print(result)
-```
-
----
-
-### ✅ With Custom Image Model
-
-#### 1. Train Custom Image Model
-
-```python
-x = "path/to/reference_images"
-y = "path/to/target_images"
-mono_img.create_image_model(directory_x=x, directory_y=y)
-```
-
-#### 2. Mount and Search with Custom Model
-
-```python
-model = "/path/to/custom_trained_image_embedding_model/image_model.keras"
-
-mono_img.mount_image_batch("image_directory", model_path=model)
-
-result = mono_img.find_similar_image("query.jpg", k=3, model_path=model)
-print(result)
-```
-
----
-
-## ✅ Summary of Key Functions
-
-| Operation          | Document                 | Audio                | Image                |
-| ------------------ | ------------------------ | -------------------- | -------------------- |
-| Mount file         | `mount_document`         | `mount_audio`        | `mount_image`        |
-| Mount batch        | —                        | `mount_audio_batch`  | `mount_image_batch`  |
-| Similarity search  | `find_similar_documents` | `find_similar_audio` | `find_similar_image` |
-| Train custom model | —                        | `create_audio_model` | `create_image_model` |
-| Use custom model   | —                        | via `model_path`     | via `model_path`     |
-
----
-
+Licensed under the MIT License. See [LICENSE](LICENSE).

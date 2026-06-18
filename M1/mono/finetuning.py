@@ -25,6 +25,7 @@ def cosine_contrastive_loss(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
 
 
 # L2 normalize the embeddings
+
 @tf.keras.utils.register_keras_serializable()
 def l2_normalize(x: tf.Tensor) -> tf.Tensor:
     return tf.math.l2_normalize(x, axis=1)
