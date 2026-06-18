@@ -99,7 +99,7 @@ When `inbuilt_model=False` is passed to the `embed` method, Mono-Kit uses its in
 |----------|----------|
 | Image | EfficientNet-B0 |
 | Audio | Log-Mel Spectrogram + RoPE-based encoder |
-| Video | Image Encoder + RCNN-inspired architecture with Attention layers |
+| Video | Image Encoder + LRCN-inspired architecture with Attention layers |
 | Text | LLM-style RoPE-based encoder |
 
 ### Device Selection
