@@ -27,12 +27,12 @@ def test_comparative_modalities():
     # define test groups
     test_groups = {
         "dove": {
-            "image": ["test_dir/dove1.jpeg", "test_dir/dove2.jpeg"],
-            "audio": ["test_dir/dove.mp3", "test_dir/dove2.mp3"],
+            "image": ["test_dir/dove1.png", "test_dir/dove2.jpeg"],
+            "audio": ["test_dir/dove1.mp3", "test_dir/dove2.mp3"],
             "text": ["a bird", "a dove"]
         },
         "diff": {
-            "image": ["test_dir/diff.jpeg"],
+            "image": ["test_dir/diff.png"],
             "audio": ["test_dir/diff.mp3"],
             "video": ["test_dir/diff.mp4"]
         },
